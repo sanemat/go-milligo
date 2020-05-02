@@ -1,0 +1,33 @@
+name: release
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup env
+        run: |
+          echo ::set-env name=GOPATH::${{ github.workspace }}
+        shell: bash
+      - name: setup go
+        uses: actions/setup-go@v2.0.3
+        with:
+          go-version: 1.x
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/${{ github.repository }}
+      - name: deps
+        run: |
+          cd $GOPATH/src/github.com/${{ github.repository }}
+          make install-tools
+        shell: bash
+      - name: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          cd $GOPATH/src/github.com/${{ github.repository }}
+          make crossbuild upload
+        shell: bash
