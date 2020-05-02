@@ -2,13 +2,13 @@ package main
 
 import "fmt"
 
-func FibonacciRecursion(n int) int {
+func fibonacciRecursion(n int) int {
 	if n <= 1 {
 		return n
 	}
-	return FibonacciRecursion(n-1) + FibonacciRecursion(n-2)
+	return fibonacciRecursion(n-1) + fibonacciRecursion(n-2)
 }
 
 func main() {
-	fmt.Println(FibonacciRecursion(10)) // 55
+	fmt.Println(fibonacciRecursion(10)) // 55
 }

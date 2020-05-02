@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func FibonacciLoop(n int) int {
+func fibonacciLoop(n int) int {
 	f := make([]int, n+1, n+2)
 	if n < 2 {
 		f = f[0:2]
@@ -16,5 +16,5 @@ func FibonacciLoop(n int) int {
 }
 
 func main() {
-	fmt.Println(FibonacciLoop(500)) // 2171430676560690477
+	fmt.Println(fibonacciLoop(500)) // 2171430676560690477
 }
