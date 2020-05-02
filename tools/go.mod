@@ -1,4 +1,4 @@
-module github.com/sanemat/go-boilerplate/tools
+module github.com/sanemat/go-milligo/tools
 
 go 1.13
 

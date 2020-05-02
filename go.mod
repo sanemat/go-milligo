@@ -1,3 +1,3 @@
-module github.com/sanemat/go-boilerplate
+module github.com/sanemat/go-milligo
 
 go 1.13
