@@ -5,7 +5,8 @@ u := $(if $(update),-u)
 
 .PHONY: test
 test: download
-	go test
+	go test && \
+	bash test.sh
 
 .PHONY: download
 download:

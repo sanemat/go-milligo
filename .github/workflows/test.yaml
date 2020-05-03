@@ -31,13 +31,32 @@ jobs:
           cd $GOPATH/src/github.com/${{ github.repository }}
           make install-tools
         shell: bash
+      - name: install wasmtime
+        run: curl https://wasmtime.dev/install.sh -sSf | bash
+        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
+      - name: path wasmtime
+        run: |
+          echo "::add-path::$HOME/.wasmtime/bin"
+        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
+        shell: bash
       - name: lint
         run: |
           cd $GOPATH/src/github.com/${{ github.repository }}
           golint -set_exit_status ./...
         shell: bash
-      - name: test
+      - name: build
+        run: |
+          cd $GOPATH/src/github.com/${{ github.repository }}
+          make build
+        shell: bash
+      - name: test go
         run: |
           cd $GOPATH/src/github.com/${{ github.repository }}
           go test -coverprofile coverage.out -covermode atomic ./...
+        shell: bash
+      - name: test bash
+        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
+        run: |
+          cd $GOPATH/src/github.com/${{ github.repository }}
+          bash test.sh
         shell: bash
