@@ -7,7 +7,11 @@
 
     (func $main (export "_start")
         (call $proc_exit
-            (i32.const 42) ;; exit code
+            i32.const 5
+            i32.const 20
+            i32.add
+            i32.const 4
+            i32.sub
         )
     )
 )
