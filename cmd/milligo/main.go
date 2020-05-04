@@ -34,6 +34,21 @@ func main() {
 				fmt.Printf("            i32.const %d\n", n)
 				ns = ""
 				op = r
+				outFirstNum = true
+			} else {
+				n, err := strconv.Atoi(ns)
+				if err != nil {
+					fmt.Printf("not integer. got=%s", ns)
+				}
+				fmt.Printf("            i32.const %d\n", n)
+				ns = ""
+				if op == '+' {
+					fmt.Print("            i32.add\n")
+				}
+				if op == '-' {
+					fmt.Print("            i32.sub\n")
+				}
+				op = r
 			}
 
 		}
