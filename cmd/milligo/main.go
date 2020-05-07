@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	token2 "github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
 )
 
+var ErrOpMismatch = errors.New("op mismatch")
 var token *token2.Token
 
 // Consumes the current token if it matches `op`.
@@ -20,7 +22,11 @@ func consume(op string) bool {
 
 // Ensure that the current token is `op`.
 func expect(op string) error {
-
+	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
+		return ErrOpMismatch
+	}
+	token = token.Next
+	return nil
 }
 
 func main() {
