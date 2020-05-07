@@ -44,7 +44,7 @@ func atEof() bool {
 	return token.Kind == token2.EOF
 }
 
-func newToken(kind token2.Kind, cur token2.Token, str string) token2.Token {
+func newToken(kind token2.Kind, cur *token2.Token, str string) token2.Token {
 	tok := token2.Token{
 		Kind: kind,
 		Str:  str,
@@ -53,11 +53,19 @@ func newToken(kind token2.Kind, cur token2.Token, str string) token2.Token {
 	return tok
 }
 
+func tokenize(s string) (token2.Token, error) {
+	head := token2.Token{}
+	head = newToken(token2.NUM, &head, s)
+	return head, nil
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("args is not 2. got=%d", len(os.Args))
 		os.Exit(1)
 	}
+
+	token, err := tokenize(os.Args[1])
 
 	fmt.Print("(module\n")
 	fmt.Print("    (import \"wasi_unstable\" \"proc_exit\" (func $proc_exit (param i32)))\n")
