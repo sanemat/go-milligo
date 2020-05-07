@@ -9,11 +9,6 @@ import (
 
 var token *token2.Token
 
-func _error(format string, a ...interface{}) {
-	fmt.Errorf(format, a)
-	os.Exit(1)
-}
-
 // Consumes the current token if it matches `op`.
 func consume(op string) bool {
 	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
