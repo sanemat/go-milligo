@@ -9,6 +9,7 @@ import (
 )
 
 var ErrOpMismatch = errors.New("op mismatch")
+var ErrTokenIsNotNum = errors.New("expected a number")
 var token *token2.Token
 
 // Consumes the current token if it matches `op`.
@@ -27,6 +28,16 @@ func expect(op string) error {
 	}
 	token = token.Next
 	return nil
+}
+
+// Ensure that the current token is NUM.
+func expectNumber() (float32, error) {
+	if token.Kind != token2.NUM {
+		return 0, ErrTokenIsNotNum
+	}
+	val := token.Val
+	token = token.Next
+	return val, nil
 }
 
 func main() {
