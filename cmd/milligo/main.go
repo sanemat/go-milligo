@@ -9,6 +9,7 @@ import (
 
 var token *token2.Token
 
+// Consumes the current token if it matches `op`.
 func consume(op string) bool {
 	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
 		return false
