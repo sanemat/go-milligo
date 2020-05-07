@@ -44,6 +44,15 @@ func atEof() bool {
 	return token.Kind == token2.EOF
 }
 
+func newToken(kind token2.Kind, cur token2.Token, str string) token2.Token {
+	tok := token2.Token{
+		Kind: kind,
+		Str:  str,
+	}
+	cur.Next = &tok
+	return tok
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("args is not 2. got=%d", len(os.Args))
