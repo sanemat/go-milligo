@@ -3,49 +3,49 @@ package main
 import (
 	"errors"
 	"fmt"
-	token2 "github.com/sanemat/go-milligo/token"
+	"github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
 )
 
 var ErrOpMismatch = errors.New("op mismatch")
 var ErrTokenIsNotNum = errors.New("expected a number")
-var token *token2.Token
+var tk *token.Token
 
-// Consumes the current token if it matches `op`.
+// Consumes the current tk if it matches `op`.
 func consume(op string) bool {
-	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
+	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
 		return false
 	}
-	token = token.Next
+	tk = tk.Next
 	return true
 }
 
-// Ensure that the current token is `op`.
+// Ensure that the current tk is `op`.
 func expect(op string) error {
-	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
+	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
 		return ErrOpMismatch
 	}
-	token = token.Next
+	tk = tk.Next
 	return nil
 }
 
-// Ensure that the current token is NUM.
+// Ensure that the current tk is NUM.
 func expectNumber() (float32, error) {
-	if token.Kind != token2.NUM {
+	if tk.Kind != token.NUM {
 		return 0, ErrTokenIsNotNum
 	}
-	val := token.Val
-	token = token.Next
+	val := tk.Val
+	tk = tk.Next
 	return val, nil
 }
 
 func atEof() bool {
-	return token.Kind == token2.EOF
+	return tk.Kind == token.EOF
 }
 
-func newToken(kind token2.Kind, cur *token2.Token, str string) token2.Token {
-	tok := token2.Token{
+func newToken(kind token.Kind, cur *token.Token, str string) token.Token {
+	tok := token.Token{
 		Kind: kind,
 		Str:  str,
 	}
@@ -53,10 +53,10 @@ func newToken(kind token2.Kind, cur *token2.Token, str string) token2.Token {
 	return tok
 }
 
-func tokenize(s string) (token2.Token, error) {
-	head := token2.Token{}
-	head = newToken(token2.NUM, &head, s)
-	return head, nil
+func tokenize(s string) (*token.Token, error) {
+	head := token.Token{}
+	head = newToken(token.NUM, &head, s)
+	return &head, nil
 }
 
 func main() {
@@ -65,7 +65,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	token, err := tokenize(os.Args[1])
+	tk, _ = tokenize(os.Args[1])
 
 	fmt.Print("(module\n")
 	fmt.Print("    (import \"wasi_unstable\" \"proc_exit\" (func $proc_exit (param i32)))\n")
