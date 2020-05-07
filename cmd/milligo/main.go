@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	token2 "github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
 )
+
+var token *token2.Token
 
 func main() {
 	if len(os.Args) != 2 {
