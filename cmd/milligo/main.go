@@ -40,6 +40,10 @@ func expectNumber() (float32, error) {
 	return val, nil
 }
 
+func atEof() bool {
+	return token.Kind == token2.EOF
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("args is not 2. got=%d", len(os.Args))
