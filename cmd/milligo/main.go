@@ -9,6 +9,14 @@ import (
 
 var token *token2.Token
 
+func consume(op string) bool {
+	if token.Kind != token2.RESERVED || string(token.Str[0]) != op {
+		return false
+	}
+	token = token.Next
+	return true
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("args is not 2. got=%d", len(os.Args))

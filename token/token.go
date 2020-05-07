@@ -6,7 +6,7 @@ type Token struct {
 	Kind Kind
 	Next *Token
 	Val  float32
-	Str  *string
+	Str  string
 }
 
 const (
