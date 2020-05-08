@@ -6,10 +6,13 @@ import (
 	"github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
+	"unicode"
 )
 
 var ErrOpMismatch = errors.New("op mismatch")
 var ErrTokenIsNotNum = errors.New("expected a number")
+var ErrTokenize = errors.New("not integer")
+var ErrInvalidToken = errors.New("invalid token")
 var tk *token.Token
 
 // Consumes the current tk if it matches `op`.
@@ -44,19 +47,53 @@ func atEof() bool {
 	return tk.Kind == token.EOF
 }
 
-func newToken(kind token.Kind, cur *token.Token, str string) token.Token {
+func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 	tok := token.Token{
 		Kind: kind,
 		Str:  str,
 	}
 	cur.Next = &tok
-	return tok
+	return &tok
 }
 
 func tokenize(s string) (*token.Token, error) {
 	head := token.Token{}
-	head = newToken(token.NUM, &head, s)
-	return &head, nil
+	cur := &head
+	for i:= 0; i <= len(s); i++ {
+		// Skip whitespace characters.
+		if unicode.IsSpace(rune(s[i])) {
+			continue
+		}
+
+		// Punctuator
+		if rune(s[i]) == '+' || rune(s[i]) == '-' {
+			cur = newToken(token.RESERVED, cur, string(s[i]))
+			continue
+		}
+
+		// Integer literal
+		if unicode.IsDigit(rune(s[i])) {
+			ns := ""
+			j := i
+			for {
+				if !unicode.IsDigit(rune(s[j])) {
+					n, err := strconv.Atoi(ns)
+					if err != nil {
+						return nil, ErrTokenize
+					}
+					cur = newToken(token.NUM, cur, ns)
+					cur.Val = n
+					break
+				}
+				j++
+			}
+			continue
+		}
+		return nil, ErrInvalidToken
+	}
+
+	newToken(token.EOF, cur, "")
+	return head.Next, nil
 }
 
 func main() {

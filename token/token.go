@@ -5,7 +5,7 @@ type Kind string
 type Token struct {
 	Kind Kind
 	Next *Token
-	Val  float32
+	Val  int
 	Str  string
 }
 
