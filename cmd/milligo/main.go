@@ -34,7 +34,7 @@ func expect(op string) error {
 }
 
 // Ensure that the current tk is NUM.
-func expectNumber() (float32, error) {
+func expectNumber() (int, error) {
 	if tk.Kind != token.NUM {
 		return 0, ErrTokenIsNotNum
 	}
@@ -96,13 +96,15 @@ func tokenize(s string) (*token.Token, error) {
 	return head.Next, nil
 }
 
+var err2 error
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("args is not 2. got=%d", len(os.Args))
 		os.Exit(1)
 	}
 
-	tk, _ = tokenize(os.Args[1])
+	tk, err2 = tokenize(os.Args[1])
 
 	fmt.Print("(module\n")
 	fmt.Print("    (import \"wasi_unstable\" \"proc_exit\" (func $proc_exit (param i32)))\n")
