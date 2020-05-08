@@ -113,51 +113,33 @@ func main() {
 	fmt.Print("    (func $main (export \"_start\")\n")
 	fmt.Print("        (call $proc_exit\n")
 
-	var outFirstNum = false
-	var ns string
-	var op rune
-	for _, r := range os.Args[1] {
-		if '0' <= r && r <= '9' {
-			ns = ns + string(r)
-		} else if r == '+' || r == '-' {
-			if !outFirstNum {
-				n, err := strconv.Atoi(ns)
-				if err != nil {
-					fmt.Printf("not integer. got=%s", ns)
-				}
-				fmt.Printf("            i32.const %d\n", n)
-				ns = ""
-				op = r
-				outFirstNum = true
-			} else {
-				n, err := strconv.Atoi(ns)
-				if err != nil {
-					fmt.Printf("not integer. got=%s", ns)
-				}
-				fmt.Printf("            i32.const %d\n", n)
-				ns = ""
-				if op == '+' {
-					fmt.Print("            i32.add\n")
-				}
-				if op == '-' {
-					fmt.Print("            i32.sub\n")
-				}
-				op = r
-			}
-
-		}
+	// The first token must be a number
+	n, err := expectNumber()
+	if err != nil {
+		errors.New("something happened")
+		os.Exit(1)
 	}
-	if ns != "" {
-		n, err := strconv.Atoi(ns)
+	fmt.Printf("            i32.const %d\n", n)
+	for !atEof() {
+		if consume("+") {
+			n, err := expectNumber()
+			if err != nil {
+				errors.New("something happened")
+				os.Exit(1)
+			}
+			fmt.Printf("            i32.const %d\n", n)
+			fmt.Print("            i32.add\n")
+		}
+		if err := expect("-"); err != nil {
+			errors.New("something happened")
+			os.Exit(1)
+		}
+		n, err := expectNumber()
 		if err != nil {
-			fmt.Printf("not integer. got=%s", ns)
+			errors.New("something happened")
+			os.Exit(1)
 		}
 		fmt.Printf("            i32.const %d\n", n)
-	}
-	if op == '+' {
-		fmt.Print("            i32.add\n")
-	}
-	if op == '-' {
 		fmt.Print("            i32.sub\n")
 	}
 
