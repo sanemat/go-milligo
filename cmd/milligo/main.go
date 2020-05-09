@@ -9,6 +9,7 @@ import (
 	"unicode"
 )
 
+var ErrOpMismatch = errors.New("op mismatch")
 var ErrTokenIsNotNum = errors.New("expected a number")
 var ErrTokenizeInt = errors.New("expect number string")
 var ErrInvalidToken = errors.New("invalid token")
@@ -21,6 +22,15 @@ func consume(op string) bool {
 	}
 	tk = tk.Next
 	return true
+}
+
+// Ensure that the current tk is `op`.
+func expect(op string) error {
+	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
+		return ErrOpMismatch
+	}
+	tk = tk.Next
+	return nil
 }
 
 // Ensure that the current tk is NUM.
@@ -52,7 +62,7 @@ func tokenize(s string) (*token.Token, error) {
 	for i:= 0; i < len(s); i++ {
 
 		// Punctuator
-		if string(s[i]) == "+" {
+		if string(s[i]) == "+" || string(s[i]) == "-" {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
@@ -119,7 +129,22 @@ func main() {
 
 			fmt.Printf("            i32.const %d\n", n)
 			fmt.Print("            i32.add\n")
+			continue
 		}
+
+		if err := expect("-"); err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}
+		n, err := expectNumber()
+		if err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Printf("            i32.const %d\n", n)
+		fmt.Print("            i32.sub\n")
+		continue
 	}
 	fmt.Print("        )\n")
 	fmt.Print("    )\n")
