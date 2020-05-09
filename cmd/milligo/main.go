@@ -11,7 +11,6 @@ import (
 
 var errTokenIsNotNum = errors.New("expected a number")
 var errTokenizeInt = errors.New("expect number string")
-var errInvalidToken = errors.New("invalid token")
 var tk *token.Token
 var userInput string
 
@@ -89,7 +88,7 @@ func tokenize() (*token.Token, error) {
 			i = j - 1
 			continue
 		}
-		return nil, errInvalidToken
+		return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "invalid token")
 	}
 	newToken(token.EOF, cur, "")
 	return head.Next, nil
