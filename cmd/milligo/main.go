@@ -9,7 +9,6 @@ import (
 	"unicode"
 )
 
-var errOpMismatch = errors.New("op mismatch")
 var errTokenIsNotNum = errors.New("expected a number")
 var errTokenizeInt = errors.New("expect number string")
 var errInvalidToken = errors.New("invalid token")
@@ -27,7 +26,7 @@ func consume(op string) bool {
 // Ensure that the current tk is `op`.
 func expect(op string) error {
 	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
-		return errOpMismatch
+		return fmt.Errorf("expected=%s", op)
 	}
 	tk = tk.Next
 	return nil
