@@ -52,7 +52,7 @@ func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 	return &tok
 }
 
-func atEof() bool {
+func atEOF() bool {
 	return tk.Kind == token.EOF
 }
 
@@ -119,7 +119,7 @@ func main() {
 	}
 	fmt.Printf("            i32.const %d\n", n)
 
-	for !atEof() {
+	for !atEOF() {
 		if consume("+") {
 			n, err := expectNumber()
 			if err != nil {
