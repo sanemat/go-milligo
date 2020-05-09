@@ -97,13 +97,13 @@ var err2 error
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Printf("args is not 2. got=%d", len(os.Args))
+		fmt.Fprintf(os.Stderr, "args is not 2. got=%d", len(os.Args))
 		os.Exit(1)
 	}
 
 	tk, err2 = tokenize(os.Args[1])
 	if err2 != nil {
-		fmt.Print(err2.Error())
+		fmt.Fprint(os.Stderr, err2.Error())
 		os.Exit(1)
 	}
 
@@ -117,7 +117,7 @@ func main() {
 	// The first token must be a number
 	n, err := expectNumber()
 	if err != nil {
-		fmt.Print(err.Error())
+		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 	fmt.Printf("            i32.const %d\n", n)
@@ -126,7 +126,7 @@ func main() {
 		if consume("+") {
 			n, err := expectNumber()
 			if err != nil {
-				fmt.Print(err.Error())
+				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
 			}
 
@@ -136,12 +136,12 @@ func main() {
 		}
 
 		if err := expect("-"); err != nil {
-			fmt.Print(err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 		n, err := expectNumber()
 		if err != nil {
-			fmt.Print(err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
