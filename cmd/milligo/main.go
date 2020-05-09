@@ -15,7 +15,7 @@ var userInput string
 
 // Consumes the current tk if it matches `op`.
 func consume(op string) bool {
-	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
+	if tk.Kind != token.RESERVED || tk.Str != op {
 		return false
 	}
 	tk = tk.Next
@@ -24,8 +24,8 @@ func consume(op string) bool {
 
 // Ensure that the current tk is `op`.
 func expect(op string) error {
-	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
-		return fmt.Errorf("%s\nexpected=%s, actual=%s", userInput, op, string(tk.Str[0]))
+	if tk.Kind != token.RESERVED || tk.Str != op {
+		return fmt.Errorf("%s\nexpected=%s, actual=%s", userInput, op, tk.Str)
 	}
 	tk = tk.Next
 	return nil
