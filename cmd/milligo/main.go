@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/sanemat/go-milligo/token"
 	"os"
@@ -9,7 +8,6 @@ import (
 	"unicode"
 )
 
-var errTokenIsNotNum = errors.New("expected a number")
 var tk *token.Token
 var userInput string
 
