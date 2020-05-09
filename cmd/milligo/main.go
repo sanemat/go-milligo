@@ -13,6 +13,7 @@ var errTokenIsNotNum = errors.New("expected a number")
 var errTokenizeInt = errors.New("expect number string")
 var errInvalidToken = errors.New("invalid token")
 var tk *token.Token
+var userInput string
 
 // Consumes the current tk if it matches `op`.
 func consume(op string) bool {
@@ -55,7 +56,8 @@ func atEOF() bool {
 	return tk.Kind == token.EOF
 }
 
-func tokenize(s string) (*token.Token, error) {
+func tokenize() (*token.Token, error) {
+	s := userInput
 	head := token.Token{}
 	cur := &head
 	for i:= 0; i < len(s); i++ {
@@ -101,7 +103,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	tk, err2 = tokenize(os.Args[1])
+	userInput = os.Args[1]
+	tk, err2 = tokenize()
 	if err2 != nil {
 		fmt.Fprint(os.Stderr, err2.Error())
 		os.Exit(1)
