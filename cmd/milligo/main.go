@@ -130,21 +130,33 @@ func expr() *parser.Node {
 	}
 }
 
-// mul = primary ("*" primary | "/" primary)*
+// mul = unary ("*" unary | "/" unary)*
 func mul() *parser.Node {
-	node := primary()
+	node := unary()
 	for {
 		if consume("*") {
-			node = newBinary(parser.MUL, node, primary())
+			node = newBinary(parser.MUL, node, unary())
 		} else if consume("/") {
-			node = newBinary(parser.DIV, node, primary())
+			node = newBinary(parser.DIV, node, unary())
 		} else {
 			return node
 		}
 	}
 }
 
-// primary = num | "(" expr ")"
+// unary = ("+" | "-")? unary
+//       | primary
+func unary() *parser.Node {
+	if consume("+") {
+		return unary()
+	}
+	if consume("-") {
+		return newBinary(parser.SUB, newNum(0), unary())
+	}
+	return primary()
+}
+
+// primary = "(" expr ")" | num
 func primary() *parser.Node {
 	if consume("(") {
 		node := expr()
