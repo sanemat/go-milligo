@@ -10,7 +10,6 @@ import (
 )
 
 var errTokenIsNotNum = errors.New("expected a number")
-var errTokenizeInt = errors.New("expect number string")
 var tk *token.Token
 var userInput string
 
@@ -26,7 +25,7 @@ func consume(op string) bool {
 // Ensure that the current tk is `op`.
 func expect(op string) error {
 	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
-		return fmt.Errorf("expected=%s", op)
+		return fmt.Errorf("%s\nexpected=%s, actual=%s", userInput, op, string(tk.Str[0]))
 	}
 	tk = tk.Next
 	return nil
@@ -82,7 +81,7 @@ func tokenize() (*token.Token, error) {
 			cur = newToken(token.NUM, cur, s[i:j])
 			n, err := strconv.Atoi(s[i:j])
 			if err != nil {
-				return nil, errTokenizeInt
+				return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "expect number string")
 			}
 			cur.Val = n
 			i = j - 1
