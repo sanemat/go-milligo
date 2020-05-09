@@ -6,6 +6,7 @@ import (
 	"github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -64,7 +65,7 @@ func tokenize() (*token.Token, error) {
 		}
 
 		// Punctuator
-		if string(s[i]) == "+" || string(s[i]) == "-" {
+		if strings.ContainsAny(string(s[i]), "-+") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
