@@ -65,7 +65,7 @@ func tokenize() (*token.Token, error) {
 		}
 
 		// Punctuator
-		if strings.ContainsAny(string(s[i]), "-+*/") {
+		if strings.ContainsAny(string(s[i]), "-+*/()") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
@@ -130,33 +130,34 @@ func expr() *parser.Node {
 	}
 }
 
-// mul  = num ("*" num | "/" num)*
+// mul = primary ("*" primary | "/" primary)*
 func mul() *parser.Node {
+	node := primary()
+	for {
+		if consume("*") {
+			node = newBinary(parser.MUL, node, primary())
+		} else if consume("/") {
+			node = newBinary(parser.DIV, node, primary())
+		} else {
+			return node
+		}
+	}
+}
+
+// primary = num | "(" expr ")"
+func primary() *parser.Node {
+	if consume("(") {
+		node := expr()
+		expect(")")
+		return node
+	}
+
 	n, err := expectNumber()
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	node := newNum(n)
-	for {
-		if consume("*") {
-			n, err := expectNumber()
-			if err != nil {
-				fmt.Fprint(os.Stderr, err.Error())
-				os.Exit(1)
-			}
-			node = newBinary(parser.MUL, node, newNum(n))
-		} else if consume("/") {
-			n, err := expectNumber()
-			if err != nil {
-				fmt.Fprint(os.Stderr, err.Error())
-				os.Exit(1)
-			}
-			node = newBinary(parser.DIV, node, newNum(n))
-		} else {
-			return node
-		}
-	}
+	return newNum(n)
 }
 
 //
