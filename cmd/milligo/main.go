@@ -6,6 +6,7 @@ import (
 	"github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -64,7 +65,7 @@ func tokenize() (*token.Token, error) {
 		}
 
 		// Punctuator
-		if string(s[i]) == "+" || string(s[i]) == "-" {
+		if strings.ContainsAny(string(s[i]), "-+*/") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
@@ -115,8 +116,22 @@ func newNum(val int) *parser.Node {
 	return &node
 }
 
-// expr = num ("+" num | "-" num)*
+// expr = mul ("+" mul | "-" mul)*
 func expr() *parser.Node {
+	node := mul()
+	for {
+		if consume("+") {
+			node = newBinary(parser.ADD, node, mul())
+		} else if consume("-") {
+			node = newBinary(parser.SUB, node, mul())
+		} else {
+			return node
+		}
+	}
+}
+
+// mul  = num ("*" num | "/" num)*
+func mul() *parser.Node {
 	n, err := expectNumber()
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
@@ -124,20 +139,20 @@ func expr() *parser.Node {
 	}
 	node := newNum(n)
 	for {
-		if consume("+") {
+		if consume("*") {
 			n, err := expectNumber()
 			if err != nil {
 				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
 			}
-			node = newBinary(parser.ADD, node, newNum(n))
-		} else if consume("-") {
+			node = newBinary(parser.MUL, node, newNum(n))
+		} else if consume("/") {
 			n, err := expectNumber()
 			if err != nil {
 				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
 			}
-			node = newBinary(parser.SUB, node, newNum(n))
+			node = newBinary(parser.DIV, node, newNum(n))
 		} else {
 			return node
 		}
@@ -161,6 +176,10 @@ func gen(node *parser.Node) {
 		fmt.Print("            i32.add\n")
 	case parser.SUB:
 		fmt.Print("            i32.sub\n")
+	case parser.MUL:
+		fmt.Print("            i32.mul\n")
+	case parser.DIV:
+		fmt.Print("            i32.div_s\n")
 	}
 }
 
