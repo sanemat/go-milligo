@@ -34,7 +34,7 @@ func expect(op string) error {
 // Ensure that the current tk is NUM.
 func expectNumber() (int, error) {
 	if tk.Kind != token.NUM {
-		return 0, errTokenIsNotNum
+		return 0, fmt.Errorf("%s\nexpect NUM, got=%s", userInput, tk.Kind)
 	}
 	val := tk.Val
 	tk = tk.Next
