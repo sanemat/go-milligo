@@ -60,6 +60,10 @@ func tokenize(s string) (*token.Token, error) {
 	head := token.Token{}
 	cur := &head
 	for i:= 0; i < len(s); i++ {
+		// Skip whitespace characters.
+		if unicode.IsSpace(rune(s[i])) {
+			continue
+		}
 
 		// Punctuator
 		if string(s[i]) == "+" || string(s[i]) == "-" {
