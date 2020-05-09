@@ -14,6 +14,15 @@ var ErrTokenizeInt = errors.New("expect number string")
 var ErrInvalidToken = errors.New("invalid token")
 var tk *token.Token
 
+// Consumes the current tk if it matches `op`.
+func consume(op string) bool {
+	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
+		return false
+	}
+	tk = tk.Next
+	return true
+}
+
 // Ensure that the current tk is NUM.
 func expectNumber() (int, error) {
 	if tk.Kind != token.NUM {
@@ -41,6 +50,13 @@ func tokenize(s string) (*token.Token, error) {
 	head := token.Token{}
 	cur := &head
 	for i:= 0; i < len(s); i++ {
+
+		// Punctuator
+		if string(s[i]) == "+" {
+			cur = newToken(token.RESERVED, cur, string(s[i]))
+			continue
+		}
+
 		// Integer literal
 		if unicode.IsDigit(rune(s[i])) {
 			var j int
@@ -94,6 +110,16 @@ func main() {
 	fmt.Printf("            i32.const %d\n", n)
 
 	for !atEof() {
+		if consume("+") {
+			n, err := expectNumber()
+			if err != nil {
+				fmt.Print(err.Error())
+				os.Exit(1)
+			}
+
+			fmt.Printf("            i32.const %d\n", n)
+			fmt.Print("            i32.add\n")
+		}
 	}
 	fmt.Print("        )\n")
 	fmt.Print("    )\n")
