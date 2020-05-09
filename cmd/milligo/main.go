@@ -9,10 +9,10 @@ import (
 	"unicode"
 )
 
-var ErrOpMismatch = errors.New("op mismatch")
-var ErrTokenIsNotNum = errors.New("expected a number")
-var ErrTokenizeInt = errors.New("expect number string")
-var ErrInvalidToken = errors.New("invalid token")
+var errOpMismatch = errors.New("op mismatch")
+var errTokenIsNotNum = errors.New("expected a number")
+var errTokenizeInt = errors.New("expect number string")
+var errInvalidToken = errors.New("invalid token")
 var tk *token.Token
 
 // Consumes the current tk if it matches `op`.
@@ -27,7 +27,7 @@ func consume(op string) bool {
 // Ensure that the current tk is `op`.
 func expect(op string) error {
 	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
-		return ErrOpMismatch
+		return errOpMismatch
 	}
 	tk = tk.Next
 	return nil
@@ -36,7 +36,7 @@ func expect(op string) error {
 // Ensure that the current tk is NUM.
 func expectNumber() (int, error) {
 	if tk.Kind != token.NUM {
-		return 0, ErrTokenIsNotNum
+		return 0, errTokenIsNotNum
 	}
 	val := tk.Val
 	tk = tk.Next
@@ -78,13 +78,13 @@ func tokenize(s string) (*token.Token, error) {
 			cur = newToken(token.NUM, cur, s[i:j])
 			n, err := strconv.Atoi(s[i:j])
 			if err != nil {
-				return nil, ErrTokenizeInt
+				return nil, errTokenizeInt
 			}
 			cur.Val = n
 			i = j - 1
 			continue
 		}
-		return nil, ErrInvalidToken
+		return nil, errInvalidToken
 	}
 	newToken(token.EOF, cur, "")
 	return head.Next, nil
