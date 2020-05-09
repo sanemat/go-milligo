@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/sanemat/go-milligo/token"
 	"os"
@@ -9,11 +8,8 @@ import (
 	"unicode"
 )
 
-var errOpMismatch = errors.New("op mismatch")
-var errTokenIsNotNum = errors.New("expected a number")
-var errTokenizeInt = errors.New("expect number string")
-var errInvalidToken = errors.New("invalid token")
 var tk *token.Token
+var userInput string
 
 // Consumes the current tk if it matches `op`.
 func consume(op string) bool {
@@ -27,7 +23,7 @@ func consume(op string) bool {
 // Ensure that the current tk is `op`.
 func expect(op string) error {
 	if tk.Kind != token.RESERVED || string(tk.Str[0]) != op {
-		return errOpMismatch
+		return fmt.Errorf("%s\nexpected=%s, actual=%s", userInput, op, string(tk.Str[0]))
 	}
 	tk = tk.Next
 	return nil
@@ -36,7 +32,7 @@ func expect(op string) error {
 // Ensure that the current tk is NUM.
 func expectNumber() (int, error) {
 	if tk.Kind != token.NUM {
-		return 0, errTokenIsNotNum
+		return 0, fmt.Errorf("%s\nexpect NUM, got=%s", userInput, tk.Kind)
 	}
 	val := tk.Val
 	tk = tk.Next
@@ -56,7 +52,8 @@ func atEOF() bool {
 	return tk.Kind == token.EOF
 }
 
-func tokenize(s string) (*token.Token, error) {
+func tokenize() (*token.Token, error) {
+	s := userInput
 	head := token.Token{}
 	cur := &head
 	for i:= 0; i < len(s); i++ {
@@ -82,13 +79,13 @@ func tokenize(s string) (*token.Token, error) {
 			cur = newToken(token.NUM, cur, s[i:j])
 			n, err := strconv.Atoi(s[i:j])
 			if err != nil {
-				return nil, errTokenizeInt
+				return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "expect number string")
 			}
 			cur.Val = n
 			i = j - 1
 			continue
 		}
-		return nil, errInvalidToken
+		return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "invalid token")
 	}
 	newToken(token.EOF, cur, "")
 	return head.Next, nil
@@ -98,13 +95,14 @@ var err2 error
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Printf("args is not 2. got=%d", len(os.Args))
+		fmt.Fprintf(os.Stderr, "args is not 2. got=%d", len(os.Args))
 		os.Exit(1)
 	}
 
-	tk, err2 = tokenize(os.Args[1])
+	userInput = os.Args[1]
+	tk, err2 = tokenize()
 	if err2 != nil {
-		fmt.Print(err2.Error())
+		fmt.Fprint(os.Stderr, err2.Error())
 		os.Exit(1)
 	}
 
@@ -118,7 +116,7 @@ func main() {
 	// The first token must be a number
 	n, err := expectNumber()
 	if err != nil {
-		fmt.Print(err.Error())
+		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 	fmt.Printf("            i32.const %d\n", n)
@@ -127,7 +125,7 @@ func main() {
 		if consume("+") {
 			n, err := expectNumber()
 			if err != nil {
-				fmt.Print(err.Error())
+				fmt.Fprint(os.Stderr, err.Error())
 				os.Exit(1)
 			}
 
@@ -137,12 +135,12 @@ func main() {
 		}
 
 		if err := expect("-"); err != nil {
-			fmt.Print(err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 		n, err := expectNumber()
 		if err != nil {
-			fmt.Print(err.Error())
+			fmt.Fprint(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
