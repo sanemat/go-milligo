@@ -17,5 +17,7 @@ const (
 	SUB = "SUB" // -
 	MUL = "MUL" // *
 	DIV = "DIV" // /
+	EQ  = "EQ"  // ==
+	NE  = "NE"  // !=
 	NUM = "NUM" // Integer
 )
