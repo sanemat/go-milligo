@@ -19,5 +19,7 @@ const (
 	DIV = "DIV" // /
 	EQ  = "EQ"  // ==
 	NE  = "NE"  // !=
+	LT  = "LT"  // <
+	LE  = "LE"  // <=
 	NUM = "NUM" // Integer
 )

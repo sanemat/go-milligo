@@ -65,14 +65,14 @@ func tokenize() (*token.Token, error) {
 		}
 
 		// Multi-letter punctuator
-		if len(s)-(i+1) > 0 && (s[i:i+2] == "==" || s[i:i+2] == "!=") {
+		if len(s)-(i+1) > 0 && (s[i:i+2] == "==" || s[i:i+2] == "!=" || s[i:i+2] == "<=" || s[i:i+2] == ">=") {
 			cur = newToken(token.RESERVED, cur, s[i:i+2])
 			i++
 			continue
 		}
 
 		// Single-letter punctuator
-		if strings.ContainsAny(string(s[i]), "-+*/()") {
+		if strings.ContainsAny(string(s[i]), "-+*/()<>") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
@@ -128,14 +128,33 @@ func expr() *parser.Node {
 	return equality()
 }
 
-// equality = add ("==" add | "!=" add)*
+// equality   = relational ("==" relational | "!=" relational)*
 func equality() *parser.Node {
-	node := add()
+	node := relational()
 	for {
 		if consume("==") {
-			node = newBinary(parser.EQ, node, add())
+			node = newBinary(parser.EQ, node, relational())
 		} else if consume("!=") {
-			node = newBinary(parser.NE, node, add())
+			node = newBinary(parser.NE, node, relational())
+		} else {
+			return node
+		}
+	}
+}
+
+// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+func relational() *parser.Node {
+	node := add()
+
+	for {
+		if consume("<") {
+			node = newBinary(parser.LT, node, add())
+		} else if consume("<=") {
+			node = newBinary(parser.LE, node, add())
+		} else if consume(">") {
+			node = newBinary(parser.LT, add(), node)
+		} else if consume(">=") {
+			node = newBinary(parser.LE, add(), node)
 		} else {
 			return node
 		}
@@ -223,6 +242,10 @@ func gen(node *parser.Node) {
 		fmt.Print("            i32.eq\n")
 	case parser.NE:
 		fmt.Print("            i32.ne\n")
+	case parser.LT:
+		fmt.Print("            i32.lt_s\n")
+	case parser.LE:
+		fmt.Print("            i32.le_s\n")
 	}
 }
 
