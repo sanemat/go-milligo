@@ -5,99 +5,9 @@ import (
 	"github.com/sanemat/go-milligo"
 	"github.com/sanemat/go-milligo/astnode"
 	"github.com/sanemat/go-milligo/codegen"
-	"github.com/sanemat/go-milligo/token"
+	"github.com/sanemat/go-milligo/tokenize"
 	"os"
-	"strconv"
-	"strings"
-	"unicode"
 )
-
-// Consumes the current milligo.Tk if it matches `op`.
-func consume(op string) bool {
-	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
-		return false
-	}
-	milligo.Tk = milligo.Tk.Next
-	return true
-}
-
-// Ensure that the current milligo.Tk is `op`.
-func expect(op string) error {
-	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
-		return fmt.Errorf("%s\nexpected=%s, actual=%s", milligo.UserInput, op, milligo.Tk.Str)
-	}
-	milligo.Tk = milligo.Tk.Next
-	return nil
-}
-
-// Ensure that the current milligo.Tk is NUM.
-func expectNumber() (int, error) {
-	if milligo.Tk.Kind != token.NUM {
-		return 0, fmt.Errorf("%s\nexpect NUM, got=%s", milligo.UserInput, milligo.Tk.Kind)
-	}
-	val := milligo.Tk.Val
-	milligo.Tk = milligo.Tk.Next
-	return val, nil
-}
-
-func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
-	tok := token.Token{
-		Kind: kind,
-		Str:  str,
-	}
-	cur.Next = &tok
-	return &tok
-}
-
-func atEOF() bool {
-	return milligo.Tk.Kind == token.EOF
-}
-
-func tokenize() (*token.Token, error) {
-	s := milligo.UserInput
-	head := token.Token{}
-	cur := &head
-	for i := 0; i < len(s); i++ {
-		// Skip whitespace characters.
-		if unicode.IsSpace(rune(s[i])) {
-			continue
-		}
-
-		// Multi-letter punctuator
-		if len(s)-(i+1) > 0 && (s[i:i+2] == "==" || s[i:i+2] == "!=" || s[i:i+2] == "<=" || s[i:i+2] == ">=") {
-			cur = newToken(token.RESERVED, cur, s[i:i+2])
-			i++
-			continue
-		}
-
-		// Single-letter punctuator
-		if strings.ContainsAny(string(s[i]), "-+*/()<>") {
-			cur = newToken(token.RESERVED, cur, string(s[i]))
-			continue
-		}
-
-		// Integer literal
-		if unicode.IsDigit(rune(s[i])) {
-			var j int
-			for j = i + 1; j < len(s); j++ {
-				if !unicode.IsDigit(rune(s[j])) {
-					break
-				}
-			}
-			cur = newToken(token.NUM, cur, s[i:j])
-			n, err := strconv.Atoi(s[i:j])
-			if err != nil {
-				return nil, fmt.Errorf("%s\n%*s^ %s", milligo.UserInput, i, "", "expect number string")
-			}
-			cur.Val = n
-			i = j - 1
-			continue
-		}
-		return nil, fmt.Errorf("%s\n%*s^ %s", milligo.UserInput, i, "", "invalid token")
-	}
-	newToken(token.EOF, cur, "")
-	return head.Next, nil
-}
 
 //
 // Parser
@@ -131,9 +41,9 @@ func expr() *astnode.Astnode {
 func equality() *astnode.Astnode {
 	node := relational()
 	for {
-		if consume("==") {
+		if tokenize.Consume("==") {
 			node = newBinary(astnode.EQ, node, relational())
-		} else if consume("!=") {
+		} else if tokenize.Consume("!=") {
 			node = newBinary(astnode.NE, node, relational())
 		} else {
 			return node
@@ -146,13 +56,13 @@ func relational() *astnode.Astnode {
 	node := add()
 
 	for {
-		if consume("<") {
+		if tokenize.Consume("<") {
 			node = newBinary(astnode.LT, node, add())
-		} else if consume("<=") {
+		} else if tokenize.Consume("<=") {
 			node = newBinary(astnode.LE, node, add())
-		} else if consume(">") {
+		} else if tokenize.Consume(">") {
 			node = newBinary(astnode.LT, add(), node)
-		} else if consume(">=") {
+		} else if tokenize.Consume(">=") {
 			node = newBinary(astnode.LE, add(), node)
 		} else {
 			return node
@@ -164,9 +74,9 @@ func relational() *astnode.Astnode {
 func add() *astnode.Astnode {
 	node := mul()
 	for {
-		if consume("+") {
+		if tokenize.Consume("+") {
 			node = newBinary(astnode.ADD, node, mul())
-		} else if consume("-") {
+		} else if tokenize.Consume("-") {
 			node = newBinary(astnode.SUB, node, mul())
 		} else {
 			return node
@@ -178,9 +88,9 @@ func add() *astnode.Astnode {
 func mul() *astnode.Astnode {
 	node := unary()
 	for {
-		if consume("*") {
+		if tokenize.Consume("*") {
 			node = newBinary(astnode.MUL, node, unary())
-		} else if consume("/") {
+		} else if tokenize.Consume("/") {
 			node = newBinary(astnode.DIV, node, unary())
 		} else {
 			return node
@@ -191,10 +101,10 @@ func mul() *astnode.Astnode {
 // unary = ("+" | "-")? unary
 //       | primary
 func unary() *astnode.Astnode {
-	if consume("+") {
+	if tokenize.Consume("+") {
 		return unary()
 	}
-	if consume("-") {
+	if tokenize.Consume("-") {
 		return newBinary(astnode.SUB, newNum(0), unary())
 	}
 	return primary()
@@ -202,13 +112,13 @@ func unary() *astnode.Astnode {
 
 // primary = "(" expr ")" | num
 func primary() *astnode.Astnode {
-	if consume("(") {
+	if tokenize.Consume("(") {
 		node := expr()
-		expect(")")
+		tokenize.Expect(")")
 		return node
 	}
 
-	n, err := expectNumber()
+	n, err := tokenize.ExpectNumber()
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
@@ -226,7 +136,7 @@ func main() {
 
 	// Tokenize and parse
 	milligo.UserInput = os.Args[1]
-	milligo.Tk, err2 = tokenize()
+	milligo.Tk, err2 = tokenize.Tokenize()
 	if err2 != nil {
 		fmt.Fprint(os.Stderr, err2.Error())
 		os.Exit(1)
