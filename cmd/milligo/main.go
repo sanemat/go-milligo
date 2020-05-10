@@ -17,12 +17,12 @@ func main() {
 
 	// Tokenize and parse
 	milligo.UserInput = os.Args[1]
-	tmp, err := tokenize.Tokenize()
+	var err error
+	milligo.Tk, err = tokenize.Tokenize()
 	if err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	milligo.Tk = tmp
 	node := parse.Expr()
 	codegen.Codegen(node)
 }
