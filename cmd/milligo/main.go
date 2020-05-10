@@ -64,7 +64,14 @@ func tokenize() (*token.Token, error) {
 			continue
 		}
 
-		// Punctuator
+		// Multi-letter punctuator
+		if len(s)-(i+1) > 0 && (s[i:i+2] == "==" || s[i:i+2] == "!=") {
+			cur = newToken(token.RESERVED, cur, s[i:i+2])
+			i++
+			continue
+		}
+
+		// Single-letter punctuator
 		if strings.ContainsAny(string(s[i]), "-+*/()") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
@@ -116,8 +123,27 @@ func newNum(val int) *parser.Node {
 	return &node
 }
 
-// expr = mul ("+" mul | "-" mul)*
+// expr = equality
 func expr() *parser.Node {
+	return equality()
+}
+
+// equality = add ("==" add | "!=" add)*
+func equality() *parser.Node {
+	node := add()
+	for {
+		if consume("==") {
+			node = newBinary(parser.EQ, node, add())
+		} else if consume("!=") {
+			node = newBinary(parser.NE, node, add())
+		} else {
+			return node
+		}
+	}
+}
+
+// add = mul ("+" mul | "-" mul)*
+func add() *parser.Node {
 	node := mul()
 	for {
 		if consume("+") {
@@ -193,6 +219,10 @@ func gen(node *parser.Node) {
 		fmt.Print("            i32.mul\n")
 	case parser.DIV:
 		fmt.Print("            i32.div_s\n")
+	case parser.EQ:
+		fmt.Print("            i32.eq\n")
+	case parser.NE:
+		fmt.Print("            i32.ne\n")
 	}
 }
 
