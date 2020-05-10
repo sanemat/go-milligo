@@ -1,13 +1,13 @@
-package parser
+package astnode
 
-// NodeKind for Node
-type NodeKind string
+// Kind for Astnode
+type Kind string
 
-// Node for AST node type
-type Node struct {
-	Kind NodeKind // Node NodeKind
-	LHS  *Node    // Left-hand side
-	RHS  *Node    // Right-hand side
+// Astnode for AST node type
+type Astnode struct {
+	Kind Kind     // Astnode Kind
+	LHS  *Astnode // Left-hand side
+	RHS  *Astnode // Right-hand side
 	Val  int      // Used if kind == NUM
 }
 
