@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/sanemat/go-milligo"
-	"github.com/sanemat/go-milligo/parser"
+	"github.com/sanemat/go-milligo/astnode"
 	"github.com/sanemat/go-milligo/token"
 	"os"
 	"strconv"
@@ -102,38 +102,38 @@ func tokenize() (*token.Token, error) {
 // Parser
 //
 
-func newNode(kind parser.NodeKind) parser.Node {
-	return parser.Node{
+func newNode(kind astnode.Kind) astnode.AstNode {
+	return astnode.AstNode{
 		Kind: kind,
 	}
 }
 
-func newBinary(kind parser.NodeKind, lhs *parser.Node, rhs *parser.Node) *parser.Node {
+func newBinary(kind astnode.Kind, lhs *astnode.AstNode, rhs *astnode.AstNode) *astnode.AstNode {
 	node := newNode(kind)
 	node.LHS = lhs
 	node.RHS = rhs
 	return &node
 }
 
-func newNum(val int) *parser.Node {
-	node := newNode(parser.NUM)
+func newNum(val int) *astnode.AstNode {
+	node := newNode(astnode.NUM)
 	node.Val = val
 	return &node
 }
 
 // expr = equality
-func expr() *parser.Node {
+func expr() *astnode.AstNode {
 	return equality()
 }
 
 // equality   = relational ("==" relational | "!=" relational)*
-func equality() *parser.Node {
+func equality() *astnode.AstNode {
 	node := relational()
 	for {
 		if consume("==") {
-			node = newBinary(parser.EQ, node, relational())
+			node = newBinary(astnode.EQ, node, relational())
 		} else if consume("!=") {
-			node = newBinary(parser.NE, node, relational())
+			node = newBinary(astnode.NE, node, relational())
 		} else {
 			return node
 		}
@@ -141,18 +141,18 @@ func equality() *parser.Node {
 }
 
 // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-func relational() *parser.Node {
+func relational() *astnode.AstNode {
 	node := add()
 
 	for {
 		if consume("<") {
-			node = newBinary(parser.LT, node, add())
+			node = newBinary(astnode.LT, node, add())
 		} else if consume("<=") {
-			node = newBinary(parser.LE, node, add())
+			node = newBinary(astnode.LE, node, add())
 		} else if consume(">") {
-			node = newBinary(parser.LT, add(), node)
+			node = newBinary(astnode.LT, add(), node)
 		} else if consume(">=") {
-			node = newBinary(parser.LE, add(), node)
+			node = newBinary(astnode.LE, add(), node)
 		} else {
 			return node
 		}
@@ -160,13 +160,13 @@ func relational() *parser.Node {
 }
 
 // add = mul ("+" mul | "-" mul)*
-func add() *parser.Node {
+func add() *astnode.AstNode {
 	node := mul()
 	for {
 		if consume("+") {
-			node = newBinary(parser.ADD, node, mul())
+			node = newBinary(astnode.ADD, node, mul())
 		} else if consume("-") {
-			node = newBinary(parser.SUB, node, mul())
+			node = newBinary(astnode.SUB, node, mul())
 		} else {
 			return node
 		}
@@ -174,13 +174,13 @@ func add() *parser.Node {
 }
 
 // mul = unary ("*" unary | "/" unary)*
-func mul() *parser.Node {
+func mul() *astnode.AstNode {
 	node := unary()
 	for {
 		if consume("*") {
-			node = newBinary(parser.MUL, node, unary())
+			node = newBinary(astnode.MUL, node, unary())
 		} else if consume("/") {
-			node = newBinary(parser.DIV, node, unary())
+			node = newBinary(astnode.DIV, node, unary())
 		} else {
 			return node
 		}
@@ -189,18 +189,18 @@ func mul() *parser.Node {
 
 // unary = ("+" | "-")? unary
 //       | primary
-func unary() *parser.Node {
+func unary() *astnode.AstNode {
 	if consume("+") {
 		return unary()
 	}
 	if consume("-") {
-		return newBinary(parser.SUB, newNum(0), unary())
+		return newBinary(astnode.SUB, newNum(0), unary())
 	}
 	return primary()
 }
 
 // primary = "(" expr ")" | num
-func primary() *parser.Node {
+func primary() *astnode.AstNode {
 	if consume("(") {
 		node := expr()
 		expect(")")
@@ -218,8 +218,8 @@ func primary() *parser.Node {
 //
 // Code generator
 //
-func gen(node *parser.Node) {
-	if node.Kind == parser.NUM {
+func gen(node *astnode.AstNode) {
+	if node.Kind == astnode.NUM {
 		fmt.Printf("            i32.const %d\n", node.Val)
 		return
 	}
@@ -228,21 +228,21 @@ func gen(node *parser.Node) {
 	gen(node.RHS)
 
 	switch node.Kind {
-	case parser.ADD:
+	case astnode.ADD:
 		fmt.Print("            i32.add\n")
-	case parser.SUB:
+	case astnode.SUB:
 		fmt.Print("            i32.sub\n")
-	case parser.MUL:
+	case astnode.MUL:
 		fmt.Print("            i32.mul\n")
-	case parser.DIV:
+	case astnode.DIV:
 		fmt.Print("            i32.div_s\n")
-	case parser.EQ:
+	case astnode.EQ:
 		fmt.Print("            i32.eq\n")
-	case parser.NE:
+	case astnode.NE:
 		fmt.Print("            i32.ne\n")
-	case parser.LT:
+	case astnode.LT:
 		fmt.Print("            i32.lt_s\n")
-	case parser.LE:
+	case astnode.LE:
 		fmt.Print("            i32.le_s\n")
 	}
 }
