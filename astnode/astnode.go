@@ -1,13 +1,13 @@
 package astnode
 
-// Kind for AstNode
+// Kind for Astnode
 type Kind int
 
-// AstNode for AST node type
-type AstNode struct {
-	Kind Kind     // AstNode Kind
-	LHS  *AstNode // Left-hand side
-	RHS  *AstNode // Right-hand side
+// Astnode for AST node type
+type Astnode struct {
+	Kind Kind     // Astnode Kind
+	LHS  *Astnode // Left-hand side
+	RHS  *Astnode // Right-hand side
 	Val  int      // Used if kind == NUM
 }
 

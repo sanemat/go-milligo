@@ -102,32 +102,32 @@ func tokenize() (*token.Token, error) {
 // Parser
 //
 
-func newNode(kind astnode.Kind) astnode.AstNode {
-	return astnode.AstNode{
+func newNode(kind astnode.Kind) astnode.Astnode {
+	return astnode.Astnode{
 		Kind: kind,
 	}
 }
 
-func newBinary(kind astnode.Kind, lhs *astnode.AstNode, rhs *astnode.AstNode) *astnode.AstNode {
+func newBinary(kind astnode.Kind, lhs *astnode.Astnode, rhs *astnode.Astnode) *astnode.Astnode {
 	node := newNode(kind)
 	node.LHS = lhs
 	node.RHS = rhs
 	return &node
 }
 
-func newNum(val int) *astnode.AstNode {
+func newNum(val int) *astnode.Astnode {
 	node := newNode(astnode.NUM)
 	node.Val = val
 	return &node
 }
 
 // expr = equality
-func expr() *astnode.AstNode {
+func expr() *astnode.Astnode {
 	return equality()
 }
 
 // equality   = relational ("==" relational | "!=" relational)*
-func equality() *astnode.AstNode {
+func equality() *astnode.Astnode {
 	node := relational()
 	for {
 		if consume("==") {
@@ -141,7 +141,7 @@ func equality() *astnode.AstNode {
 }
 
 // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-func relational() *astnode.AstNode {
+func relational() *astnode.Astnode {
 	node := add()
 
 	for {
@@ -160,7 +160,7 @@ func relational() *astnode.AstNode {
 }
 
 // add = mul ("+" mul | "-" mul)*
-func add() *astnode.AstNode {
+func add() *astnode.Astnode {
 	node := mul()
 	for {
 		if consume("+") {
@@ -174,7 +174,7 @@ func add() *astnode.AstNode {
 }
 
 // mul = unary ("*" unary | "/" unary)*
-func mul() *astnode.AstNode {
+func mul() *astnode.Astnode {
 	node := unary()
 	for {
 		if consume("*") {
@@ -189,7 +189,7 @@ func mul() *astnode.AstNode {
 
 // unary = ("+" | "-")? unary
 //       | primary
-func unary() *astnode.AstNode {
+func unary() *astnode.Astnode {
 	if consume("+") {
 		return unary()
 	}
@@ -200,7 +200,7 @@ func unary() *astnode.AstNode {
 }
 
 // primary = "(" expr ")" | num
-func primary() *astnode.AstNode {
+func primary() *astnode.Astnode {
 	if consume("(") {
 		node := expr()
 		expect(")")
@@ -218,7 +218,7 @@ func primary() *astnode.AstNode {
 //
 // Code generator
 //
-func gen(node *astnode.AstNode) {
+func gen(node *astnode.Astnode) {
 	if node.Kind == astnode.NUM {
 		fmt.Printf("            i32.const %d\n", node.Val)
 		return
