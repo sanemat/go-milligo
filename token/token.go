@@ -1,7 +1,7 @@
 package token
 
 // Kind for token
-type Kind string
+type Kind int
 
 // Token of program
 type Token struct {
@@ -13,7 +13,7 @@ type Token struct {
 
 // List of kind
 const (
-	RESERVED = "RESERVED"
-	NUM      = "NUM"
-	EOF      = "EOF"
+	RESERVED = iota
+	NUM
+	EOF
 )

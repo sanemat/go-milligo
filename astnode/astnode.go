@@ -1,7 +1,7 @@
 package astnode
 
 // Kind for AstNode
-type Kind string
+type Kind int
 
 // AstNode for AST node type
 type AstNode struct {
@@ -13,13 +13,13 @@ type AstNode struct {
 
 // List of kind
 const (
-	ADD = "ADD" // +
-	SUB = "SUB" // -
-	MUL = "MUL" // *
-	DIV = "DIV" // /
-	EQ  = "EQ"  // ==
-	NE  = "NE"  // !=
-	LT  = "LT"  // <
-	LE  = "LE"  // <=
-	NUM = "NUM" // Integer
+	ADD = iota // +
+	SUB        // -
+	MUL        // *
+	DIV        // /
+	EQ         // ==
+	NE         // !=
+	LT         // <
+	LE         // <=
+	NUM        // Integer
 )
