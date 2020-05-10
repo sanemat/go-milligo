@@ -9,12 +9,6 @@ import (
 	"os"
 )
 
-//
-// Parser
-//
-
-var err2 error
-
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "args is not 2. got=%d", len(os.Args))
@@ -23,11 +17,12 @@ func main() {
 
 	// Tokenize and parse
 	milligo.UserInput = os.Args[1]
-	milligo.Tk, err2 = tokenize.Tokenize()
-	if err2 != nil {
-		fmt.Fprint(os.Stderr, err2.Error())
+	tmp, err := tokenize.Tokenize()
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
+	milligo.Tk = tmp
 	node := parse.Expr()
 	codegen.Codegen(node)
 }
