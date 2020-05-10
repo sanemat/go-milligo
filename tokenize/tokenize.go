@@ -37,6 +37,10 @@ func ExpectNumber() (int, error) {
 	return val, nil
 }
 
+func atEOF() bool {
+	return milligo.Tk.Kind == token.EOF
+}
+
 func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 	tok := token.Token{
 		Kind: kind,
