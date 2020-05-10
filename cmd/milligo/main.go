@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/sanemat/go-milligo"
 	"github.com/sanemat/go-milligo/parser"
 	"github.com/sanemat/go-milligo/token"
 	"os"
@@ -10,34 +11,31 @@ import (
 	"unicode"
 )
 
-var tk *token.Token
-var userInput string
-
-// Consumes the current tk if it matches `op`.
+// Consumes the current milligo.Tk if it matches `op`.
 func consume(op string) bool {
-	if tk.Kind != token.RESERVED || tk.Str != op {
+	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
 		return false
 	}
-	tk = tk.Next
+	milligo.Tk = milligo.Tk.Next
 	return true
 }
 
-// Ensure that the current tk is `op`.
+// Ensure that the current milligo.Tk is `op`.
 func expect(op string) error {
-	if tk.Kind != token.RESERVED || tk.Str != op {
-		return fmt.Errorf("%s\nexpected=%s, actual=%s", userInput, op, tk.Str)
+	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
+		return fmt.Errorf("%s\nexpected=%s, actual=%s", milligo.UserInput, op, milligo.Tk.Str)
 	}
-	tk = tk.Next
+	milligo.Tk = milligo.Tk.Next
 	return nil
 }
 
-// Ensure that the current tk is NUM.
+// Ensure that the current milligo.Tk is NUM.
 func expectNumber() (int, error) {
-	if tk.Kind != token.NUM {
-		return 0, fmt.Errorf("%s\nexpect NUM, got=%s", userInput, tk.Kind)
+	if milligo.Tk.Kind != token.NUM {
+		return 0, fmt.Errorf("%s\nexpect NUM, got=%s", milligo.UserInput, milligo.Tk.Kind)
 	}
-	val := tk.Val
-	tk = tk.Next
+	val := milligo.Tk.Val
+	milligo.Tk = milligo.Tk.Next
 	return val, nil
 }
 
@@ -51,11 +49,11 @@ func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 }
 
 func atEOF() bool {
-	return tk.Kind == token.EOF
+	return milligo.Tk.Kind == token.EOF
 }
 
 func tokenize() (*token.Token, error) {
-	s := userInput
+	s := milligo.UserInput
 	head := token.Token{}
 	cur := &head
 	for i := 0; i < len(s); i++ {
@@ -88,13 +86,13 @@ func tokenize() (*token.Token, error) {
 			cur = newToken(token.NUM, cur, s[i:j])
 			n, err := strconv.Atoi(s[i:j])
 			if err != nil {
-				return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "expect number string")
+				return nil, fmt.Errorf("%s\n%*s^ %s", milligo.UserInput, i, "", "expect number string")
 			}
 			cur.Val = n
 			i = j - 1
 			continue
 		}
-		return nil, fmt.Errorf("%s\n%*s^ %s", userInput, i, "", "invalid token")
+		return nil, fmt.Errorf("%s\n%*s^ %s", milligo.UserInput, i, "", "invalid token")
 	}
 	newToken(token.EOF, cur, "")
 	return head.Next, nil
@@ -258,8 +256,8 @@ func main() {
 	}
 
 	// Tokenize and parse
-	userInput = os.Args[1]
-	tk, err2 = tokenize()
+	milligo.UserInput = os.Args[1]
+	milligo.Tk, err2 = tokenize()
 	if err2 != nil {
 		fmt.Fprint(os.Stderr, err2.Error())
 		os.Exit(1)
