@@ -6,6 +6,7 @@ type Kind string
 // Astnode for AST node type
 type Astnode struct {
 	Kind Kind     // Astnode Kind
+	Next *Astnode // Next node
 	LHS  *Astnode // Left-hand side
 	RHS  *Astnode // Right-hand side
 	Val  int      // Used if kind == NUM

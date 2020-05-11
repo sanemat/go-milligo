@@ -37,7 +37,8 @@ func ExpectNumber() (int, error) {
 	return val, nil
 }
 
-func atEOF() bool {
+// AtEOF return false unless eof
+func AtEOF() bool {
 	return milligo.Tk.Kind == token.EOF
 }
 

@@ -23,6 +23,6 @@ func main() {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	node := parse.Expr()
+	node := parse.Program()
 	codegen.Codegen(node)
 }
