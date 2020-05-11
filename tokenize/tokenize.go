@@ -70,7 +70,7 @@ func Tokenize() (*token.Token, error) {
 		}
 
 		// Single-letter punctuator
-		if strings.ContainsAny(string(s[i]), "-+*/()<>") {
+		if strings.ContainsAny(string(s[i]), "-+*/()<>;") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
