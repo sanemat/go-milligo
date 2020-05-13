@@ -37,7 +37,8 @@ func ExpectNumber() (int, error) {
 	return val, nil
 }
 
-func atEOF() bool {
+// AtEOF return false unless eof
+func AtEOF() bool {
 	return milligo.Tk.Kind == token.EOF
 }
 
@@ -69,7 +70,7 @@ func Tokenize() (*token.Token, error) {
 		}
 
 		// Single-letter punctuator
-		if strings.ContainsAny(string(s[i]), "-+*/()<>") {
+		if strings.ContainsAny(string(s[i]), "-+*/()<>;") {
 			cur = newToken(token.RESERVED, cur, string(s[i]))
 			continue
 		}
