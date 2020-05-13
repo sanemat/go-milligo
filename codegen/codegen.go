@@ -38,17 +38,22 @@ func gen(node *astnode.Astnode) {
 }
 
 // Codegen generates code
-func Codegen(node *astnode.Astnode) {
+func Codegen(codes []*astnode.Astnode) {
 	fmt.Print("(module\n")
 	fmt.Print("    (import \"wasi_unstable\" \"proc_exit\" (func $proc_exit (param i32)))\n")
 	fmt.Print("    (memory 1)\n")
 	fmt.Print("    (export \"memory\" (memory 0))\n")
 	fmt.Print("    (func $main (export \"_start\")\n")
+	fmt.Print("        (local $tmp i32)\n")
 	fmt.Print("        (call $proc_exit\n")
 
-	// Traverse the AST to emit assembly.
-	gen(node)
+	for _, code := range codes {
+		// Traverse the AST to emit assembly.
+		gen(code)
+		fmt.Print("            set_local $tmp\n")
+	}
 
+	fmt.Print("            get_local $tmp\n")
 	fmt.Print("        )\n")
 	fmt.Print("    )\n")
 	fmt.Print(")\n")

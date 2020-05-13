@@ -26,8 +26,27 @@ func newNum(val int) *astnode.Astnode {
 	return &node
 }
 
-// Expr expr = equality
-func Expr() *astnode.Astnode {
+// Program = []*astnode.Astnode
+func Program() []*astnode.Astnode {
+	var codes []*astnode.Astnode
+	for !tokenize.AtEOF() {
+		codes = append(codes, stmt())
+	}
+	return codes
+}
+
+// stmt = expr ";"*
+func stmt() *astnode.Astnode {
+	node := expr()
+	for {
+		if !tokenize.Consume(";") {
+			return node
+		}
+	}
+}
+
+// expr = equality
+func expr() *astnode.Astnode {
 	return equality()
 }
 
@@ -107,7 +126,7 @@ func unary() *astnode.Astnode {
 // primary = "(" expr ")" | num
 func primary() *astnode.Astnode {
 	if tokenize.Consume("(") {
-		node := Expr()
+		node := expr()
 		tokenize.Expect(")")
 		return node
 	}
