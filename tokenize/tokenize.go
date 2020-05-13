@@ -54,6 +54,11 @@ func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 // Tokenize milligo.UserInput
 func Tokenize() (*token.Token, error) {
 	s := milligo.UserInput
+	// append ";"
+	if s[len(s)-1] != ';' {
+		s = s + ";"
+	}
+
 	head := token.Token{}
 	cur := &head
 	for i := 0; i < len(s); i++ {

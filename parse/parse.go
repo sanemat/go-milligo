@@ -42,7 +42,9 @@ func Program() *astnode.Astnode {
 func stmt() *astnode.Astnode {
 	node := expr()
 	for {
-		if !tokenize.Consume(";") {
+		if tokenize.Consume(";") {
+			node = newBinary(astnode.SCO, node, nil)
+		} else {
 			return node
 		}
 	}

@@ -14,13 +14,14 @@ type Astnode struct {
 
 // List of kind
 const (
-	ADD = "ADD" // +
-	SUB = "SUB" // -
-	MUL = "MUL" // *
-	DIV = "DIV" // /
-	EQ  = "EQ"  // ==
-	NE  = "NE"  // !=
-	LT  = "LT"  // <
-	LE  = "LE"  // <=
-	NUM = "NUM" // Integer
+	ADD = "ADD"       // +
+	SUB = "SUB"       // -
+	MUL = "MUL"       // *
+	DIV = "DIV"       // /
+	EQ  = "EQ"        // ==
+	NE  = "NE"        // !=
+	LT  = "LT"        // <
+	LE  = "LE"        // <=
+	NUM = "NUM"       // Integer
+	SCO = "SEMICOLON" // ;
 )

@@ -34,6 +34,8 @@ func gen(node *astnode.Astnode) {
 		fmt.Print("            i32.lt_s\n")
 	case astnode.LE:
 		fmt.Print("            i32.le_s\n")
+	case astnode.SCO:
+		fmt.Print("            set_local $tmp\n")
 	}
 }
 
@@ -44,11 +46,13 @@ func Codegen(node *astnode.Astnode) {
 	fmt.Print("    (memory 1)\n")
 	fmt.Print("    (export \"memory\" (memory 0))\n")
 	fmt.Print("    (func $main (export \"_start\")\n")
+	fmt.Print("        (local $tmp i32)\n")
 	fmt.Print("        (call $proc_exit\n")
 
 	// Traverse the AST to emit assembly.
 	gen(node)
 
+	fmt.Print("            get_local $tmp\n")
 	fmt.Print("        )\n")
 	fmt.Print("    )\n")
 	fmt.Print(")\n")
