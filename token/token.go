@@ -17,4 +17,5 @@ const (
 	RESERVED Kind = iota
 	NUM
 	EOF
+	RETURN
 )

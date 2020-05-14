@@ -14,13 +14,14 @@ type Astnode struct {
 
 // List of kind
 const (
-	ADD Kind = iota // +
-	SUB             // -
-	MUL             // *
-	DIV             // /
-	EQ              // ==
-	NE              // !=
-	LT              // <
-	LE              // <=
-	NUM             // Integer
+	ADD    Kind = iota // +
+	SUB                // -
+	MUL                // *
+	DIV                // /
+	EQ                 // ==
+	NE                 // !=
+	LT                 // <
+	LE                 // <=
+	NUM                // Integer
+	RETURN             // "return"
 )

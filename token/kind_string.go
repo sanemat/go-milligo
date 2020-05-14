@@ -4,9 +4,9 @@ package token
 
 import "strconv"
 
-const _Kind_name = "RESERVEDNUMEOF"
+const _Kind_name = "RESERVEDNUMEOFRETURN"
 
-var _Kind_index = [...]uint8{0, 8, 11, 14}
+var _Kind_index = [...]uint8{0, 8, 11, 14, 20}
 
 func (i Kind) String() string {
 	if i < 0 || i >= Kind(len(_Kind_index)-1) {
