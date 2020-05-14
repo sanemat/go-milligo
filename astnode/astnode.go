@@ -1,7 +1,8 @@
 package astnode
 
 // Kind for Astnode
-type Kind string
+//go:generate stringer -type=Kind
+type Kind int
 
 // Astnode for AST node type
 type Astnode struct {
@@ -13,13 +14,13 @@ type Astnode struct {
 
 // List of kind
 const (
-	ADD = "ADD" // +
-	SUB = "SUB" // -
-	MUL = "MUL" // *
-	DIV = "DIV" // /
-	EQ  = "EQ"  // ==
-	NE  = "NE"  // !=
-	LT  = "LT"  // <
-	LE  = "LE"  // <=
-	NUM = "NUM" // Integer
+	ADD Kind = iota // +
+	SUB             // -
+	MUL             // *
+	DIV             // /
+	EQ              // ==
+	NE              // !=
+	LT              // <
+	LE              // <=
+	NUM             // Integer
 )

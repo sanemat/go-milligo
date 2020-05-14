@@ -1,7 +1,8 @@
 package token
 
 // Kind for token
-type Kind string
+//go:generate stringer -type=Kind
+type Kind int
 
 // Token of program
 type Token struct {
@@ -13,7 +14,7 @@ type Token struct {
 
 // List of kind
 const (
-	RESERVED = "RESERVED"
-	NUM      = "NUM"
-	EOF      = "EOF"
+	RESERVED Kind = iota
+	NUM
+	EOF
 )
