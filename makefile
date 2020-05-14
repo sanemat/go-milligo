@@ -4,7 +4,7 @@ BUILD_LDFLAGS = "-s -w -X github.com/sanemat/go-milligo.revision=$(CURRENT_REVIS
 u := $(if $(update),-u)
 
 .PHONY: test
-test: download
+test: download generate
 	go test && \
 	bash test.sh
 
@@ -26,11 +26,11 @@ echo:
 	echo $(VERSION) $(BUILD_LDFLAGS)
 
 .PHONY: build
-build: download
+build: download generate
 	go build -ldflags=$(BUILD_LDFLAGS) ./cmd/milligo
 
 .PHONY: install
-install: download
+install: download generate
 	go install -ldflags=$(BUILD_LDFLAGS) ./cmd/milligo
 
 .PHONY: crossbuild
@@ -49,3 +49,7 @@ credits.txt:
 .PHONY: changelog
 changelog:
 	git-chglog -o changelog.md --next-tag v$(VERSION)
+
+.PHONY: generate
+generate:
+	go generate ./...
