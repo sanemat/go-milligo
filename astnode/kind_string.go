@@ -4,9 +4,9 @@ package astnode
 
 import "strconv"
 
-const _Kind_name = "ADDSUBMULDIVEQNELTLENUM"
+const _Kind_name = "ADDSUBMULDIVEQNELTLENUMRETURN"
 
-var _Kind_index = [...]uint8{0, 3, 6, 9, 12, 14, 16, 18, 20, 23}
+var _Kind_index = [...]uint8{0, 3, 6, 9, 12, 14, 16, 18, 20, 23, 29}
 
 func (i Kind) String() string {
 	if i < 0 || i >= Kind(len(_Kind_index)-1) {

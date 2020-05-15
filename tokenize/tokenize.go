@@ -11,7 +11,7 @@ import (
 
 // Consume the current milligo.Tk if it matches `op`.
 func Consume(op string) bool {
-	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
+	if (milligo.Tk.Kind != token.RESERVED && milligo.Tk.Kind != token.RETURN) || milligo.Tk.Str != op {
 		return false
 	}
 	milligo.Tk = milligo.Tk.Next
@@ -20,7 +20,7 @@ func Consume(op string) bool {
 
 // Expect ensure that the current milligo.Tk is `op`.
 func Expect(op string) error {
-	if milligo.Tk.Kind != token.RESERVED || milligo.Tk.Str != op {
+	if (milligo.Tk.Kind != token.RESERVED && milligo.Tk.Kind != token.RETURN) || milligo.Tk.Str != op {
 		return fmt.Errorf("%s\nexpected=%s, actual=%s", milligo.UserInput, op, milligo.Tk.Str)
 	}
 	milligo.Tk = milligo.Tk.Next
@@ -51,6 +51,14 @@ func newToken(kind token.Kind, cur *token.Token, str string) *token.Token {
 	return &tok
 }
 
+func isAlpha(r rune) bool {
+	return ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z') || r == '_'
+}
+
+func isAlNum(r rune) bool {
+	return isAlpha(r) || ('0' <= r && r <= '9')
+}
+
 // Tokenize milligo.UserInput
 func Tokenize() (*token.Token, error) {
 	s := milligo.UserInput
@@ -59,6 +67,13 @@ func Tokenize() (*token.Token, error) {
 	for i := 0; i < len(s); i++ {
 		// Skip whitespace characters.
 		if unicode.IsSpace(rune(s[i])) {
+			continue
+		}
+
+		// Keywords
+		if (len(s)-(i+6) == 0 && s[i:i+6] == "return") || (len(s)-(i+6) > 0 && s[i:i+6] == "return" && !isAlNum(rune(s[i+6]))) {
+			cur = newToken(token.RETURN, cur, s[i:i+6])
+			i += 5
 			continue
 		}
 

@@ -20,6 +20,12 @@ func newBinary(kind astnode.Kind, lhs *astnode.Astnode, rhs *astnode.Astnode) *a
 	return &node
 }
 
+func newUnary(kind astnode.Kind, expr *astnode.Astnode) *astnode.Astnode {
+	node := newNode(kind)
+	node.LHS = expr
+	return &node
+}
+
 func newNum(val int) *astnode.Astnode {
 	node := newNode(astnode.NUM)
 	node.Val = val
@@ -35,8 +41,17 @@ func Program() []*astnode.Astnode {
 	return codes
 }
 
-// stmt = expr ";"*
+// stmt = "return" expr ";"*
+//      | expr ";"*
 func stmt() *astnode.Astnode {
+	if tokenize.Consume("return") {
+		node := newUnary(astnode.RETURN, expr())
+		for {
+			if !tokenize.Consume(";") {
+				return node
+			}
+		}
+	}
 	node := expr()
 	for {
 		if !tokenize.Consume(";") {
