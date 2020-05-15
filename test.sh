@@ -52,4 +52,6 @@ assert 1 'return 1; 2; 3'
 assert 2 '1; return 2; 3'
 assert 3 '1; 2; return 3'
 
+#assert 50 'return'
+
 echo OK
